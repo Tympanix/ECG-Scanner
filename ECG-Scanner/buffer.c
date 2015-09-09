@@ -12,6 +12,7 @@ void initBuffer(int size, buff * buffer)
 	buffer->head = size-1;
 	buffer->size = size;
 
+
 }
 
 void cleanupBuffer(buff * buffer)
