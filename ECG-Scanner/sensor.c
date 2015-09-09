@@ -2,7 +2,19 @@
 #include <stdlib.h>
 #include "sensor.h"
 
+static const char filename[] = "ECG.txt";
+static const FILE *file;
+
 int getNextData(){
-	// Implement me according to the Assignment 1 manual
-	return 0;
+	int value;
+	fscanf(file,"%i",&value);
+	return value;
+}
+
+void openFile(){
+		file = fopen(filename,"r");
+}
+
+void closeFile(){
+	fclose(file);
 }
