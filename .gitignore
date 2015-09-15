@@ -22,3 +22,12 @@ ECG-Scanner/.idea/vcs.xml
 ECG-Scanner/.idea/workspace.xml
 
 ECG-Scanner/CMakeLists.txt
+*.cproject
+ECG-Scanner/.cproject
+ECG-Scanner/.vs/ECG Scanner/v14/.suo
+*.cproject
+ECG-Scanner/ECG Scanner.sdf
+ECG-Scanner/ECG Scanner.vcxproj
+ECG-Scanner/ECG Scanner.vcxproj.filters
+*.sln
+ECG-Scanner/ECG Scanner.opensdf
