@@ -19,5 +19,6 @@ void cleanupBuffer(buff * buffer);
 void insertToBuffer(int data, buff * buffer);
 void movePointerBuffer(buff * buffer);
 int getPreviousByIntFromBuffer(int previousN, buff * buffer);
+int getHead(buff * buffer);
 
 #endif /* BUFFER_H_ */

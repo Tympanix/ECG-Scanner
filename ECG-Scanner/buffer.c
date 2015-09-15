@@ -32,10 +32,14 @@ void movePointerBuffer(buff * buffer){
 	}
 }
 
-int getPreviousByIntFromBuffer(int previousN, buff * buffer){
+int getPrevious(int previousN, buff * buffer){
 	int index = ((buffer->head+buffer->size)-(previousN%buffer->size))
 			%buffer->size;
 	return buffer->data[index];
+}
+
+int getHead(buff * buffer){
+	return getPrevious(0,buffer);
 }
 
 
