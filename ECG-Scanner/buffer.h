@@ -8,7 +8,7 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
-typedef struct Buffer{
+typedef struct{
 	int head;
 	int size;
 	int * data;
@@ -18,7 +18,7 @@ void initBuffer(int size, buff * buffer);
 void cleanupBuffer(buff * buffer);
 void insertToBuffer(int data, buff * buffer);
 void movePointerBuffer(buff * buffer);
-int getPreviousByIntFromBuffer(int previousN, buff * buffer);
-int getHead(buff * buffer);
+int getPreviousBuffer(int previousN, buff * buffer);
+int getHeadBuffer(buff * buffer);
 
 #endif /* BUFFER_H_ */

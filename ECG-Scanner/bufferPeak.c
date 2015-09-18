@@ -1,12 +1,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "buffer.h"
+#include "bufferPeak.h"
 
 
 
 
-void initBuffer(int size, buff * buffer)
+void initBufferPeak(int size, buffPeak * buffer)
 {
 	buffer->data = calloc(size,sizeof(*(buffer->data)));
 	buffer->head = size-1;
@@ -15,31 +15,31 @@ void initBuffer(int size, buff * buffer)
 
 }
 
-void cleanupBuffer(buff * buffer)
+void cleanupBufferPeak(buffPeak * buffer)
 {
 	free(buffer->data);
 }
 
-void insertToBuffer(int data, buff * buffer){
-	movePointerBuffer(buffer);
+void insertToBufferPeak(Peak data, buffPeak * buffer){
+	movePointerBufferPeak(buffer);
 	buffer->data[buffer->head] = data;
 }
 
-void movePointerBuffer(buff * buffer){
+void movePointerBufferPeak(buffPeak * buffer){
 	buffer->head += 1;
 	if(buffer->head >= buffer->size){
 		buffer->head = buffer->head%buffer->size;
 	}
 }
 
-int getPreviousBuffer(int previousN, buff * buffer){
+Peak getPreviousPeak(int previousN, buffPeak * buffer){
 	int index = ((buffer->head+buffer->size)-(previousN%buffer->size))
 			%buffer->size;
 	return buffer->data[index];
 }
 
-int getHeadBuffer(buff * buffer){
-	return getPreviousBuffer(0,buffer);
+Peak getHeadPeak(buffPeak * buffer){
+	return getPreviousPeak(0,buffer);
 }
 
 
