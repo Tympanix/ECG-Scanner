@@ -7,16 +7,16 @@
 #include "dynamicList.h"
 #include "bufferPeak.h"
 
-int SPKF;
-int NPKF;
-int THRESHOLD1;
-int THRESHOLD2;
+int SPKF = 0;
+int NPKF = 0;
+int THRESHOLD1 = 0;
+int THRESHOLD2 = 0;
 
-int RR_AVG1;
-int RR_AVG2;
-int RR_LOW;
-int RR_HIGH;
-int RR_MISS;
+int RR_AVG1 = 0;
+int RR_AVG2 = 0;
+int RR_LOW = 0;
+int RR_HIGH = 0;
+int RR_MISS = 0;
 
 int SLOPEUP = 0;
 
@@ -31,6 +31,119 @@ buffPeak peaks;
 buffPeak rpeaks;
 buffPeak rpeaks_ok;
 
+
+void filterNextData(){
+	int raw = getNextData();
+	insertToBuffer(raw,&rawIn);
+	lowPassFilter(&rawIn,&lowPassOut);
+	highPassFilter(&lowPassOut,&highPassOut);
+	derivativeFilter(&highPassOut,&derivateOut);
+	squaringFilter(&derivateOut,&squaringOut);
+	movingWindowFilter(&squaringOut,&mwiOut);
+}
+
+void updateThresholds(){
+	THRESHOLD1 = NPKF + (SPKF - NPKF)/4;
+	THRESHOLD2 = THRESHOLD1/2;
+	printf("Updated thresholds to %d and %d \n", THRESHOLD1, THRESHOLD2);
+}
+
+void updateLowHighMiss(int AVG){
+	RR_LOW = 92*AVG/100;
+	RR_HIGH = 116*AVG/100;
+	RR_MISS = 166*AVG/100;
+	printf("Updated Low %d, High %d, and Miss %d \n", RR_LOW, RR_HIGH, RR_MISS);
+}
+
+int calculateRRAVG1(){
+	int count = 8;
+	int sum = 0;
+	int i;
+	for (i = 0; i < count; i++){
+		Peak peak1 = getPreviousPeak(i, &rpeaks);
+		int previous = peak1.value;
+		//int before = getPreviousPeak(i+1, &rpeaks).value;
+		//sum += (first - before);
+		sum += previous;
+	}
+
+	return sum/count;
+}
+
+int calculateRRAVG2(){
+	int count = 8;
+	int sum = 0;
+	int i;
+	for (i = 0; i < count; i++){
+		int previous = getPreviousPeak(i, &rpeaks_ok).value;
+		//int before = getPreviousPeak(i+1, &rpeaks_ok).value;
+		//sum += (first - before);
+		sum += previous;
+	}
+
+	return sum/count;
+}
+
+void updateNewRPeak(Peak peak){
+	insertToBufferPeak(peak, &rpeaks);
+	printf("Inserted peak %d into rpeaks, ", peak.value);
+	insertToBufferPeak(peak, &rpeaks_ok);
+	SPKF = peak.value/8 + 7*SPKF/8;
+	printf("SPKF = %d \n", SPKF);
+	RR_AVG1 = calculateRRAVG1();
+	printf("new AVG1 is %d, ", RR_AVG1);
+	RR_AVG2 = calculateRRAVG2();
+	printf("new AVG2 is %d \n", RR_AVG2);
+	updateLowHighMiss(RR_AVG2);
+	updateThresholds();
+}
+
+int findPeakSearchback(){
+	int i;
+	for (i = 0; i < peaks.size; i++){
+		Peak peak = getPreviousPeak(i,&peaks);
+		if (peak.value > THRESHOLD2){
+			insertToBufferPeak(peak, &rpeaks);
+			printf("Inserted peak %d into rpeaks \n", peak.value);
+			return peak.value;
+		}
+	}
+	return 0;
+}
+
+void searchBack(){
+	int value = findPeakSearchback();
+
+	if(value != 0){
+		SPKF = value/4 + 3*SPKF/4;
+		printf("SPKF = %d \n", SPKF);
+	}
+	RR_AVG1 = calculateRRAVG1();
+	updateLowHighMiss(RR_AVG1);
+	updateThresholds();
+}
+
+void foundRPeak(Peak peak){
+	int rr = peak.time - getHeadPeak(&rpeaks).time;
+
+	if (rr > RR_LOW && rr < RR_HIGH){
+		updateNewRPeak(peak);
+		printf("Updated rpeaks \n");
+	} else {
+		if (rr > RR_MISS){
+			searchBack();
+			printf("Performed searchback \n");
+		}
+	}
+}
+
+void updateNoRPeak(Peak peak){
+	printf("Peak value = %d, ", peak.value);
+	NPKF = (0.125*peak.value) + (0.875*NPKF);
+	printf("NPKF = %d \n", NPKF);
+	updateThresholds();
+}
+
 int main(int argc, char *argv[]){
 
 
@@ -43,15 +156,15 @@ int main(int argc, char *argv[]){
 	initBuffer(30,&mwiOut);
 
 	// Initialise peaks buffer;
-	initBufferPeak(250, &peaks);
+	initBufferPeak(500, &peaks);
 	initBufferPeak(12, &rpeaks);
 
 	openFile();
 	openTestFiles();
 
 	// Preprocess the first 2 datapoints
-	filterNextData();
-	filterNextData();
+	//filterNextData();
+	//filterNextData();
 
 	int time;
 	for(time = 0; time < 1000; time++){
@@ -67,9 +180,11 @@ int main(int argc, char *argv[]){
 			insertToBufferPeak(peak, &peaks);
 
 			if (peak.value > THRESHOLD1){
+				printf("Found new rpeak \n");
 				foundRPeak(peak);
 			} else {
 				// No R Peak found
+				printf("Found no rpeak \n");
 				updateNoRPeak(peak);
 			}
 
@@ -93,7 +208,7 @@ int main(int argc, char *argv[]){
 	}
 	int i;
 	for(i = 0; i < rpeaks.size; i++){
-		printf("peak value: %d \n", getPreviousBuffer(i,&rpeaks));
+		printf("peak value: %d \n", getPreviousPeak(i, &rpeaks).value);
 	}
 
 
@@ -115,105 +230,6 @@ int main(int argc, char *argv[]){
 	return 0;
 
 }
-
-void filterNextData(){
-	int raw = getNextData();
-	insertToBuffer(raw,&rawIn);
-	lowPassFilter(&rawIn,&lowPassOut);
-	highPassFilter(&lowPassOut,&highPassOut);
-	derivativeFilter(&highPassOut,&derivateOut);
-	squaringFilter(&derivateOut,&squaringOut);
-	movingWindowFilter(&squaringOut,&mwiOut);
-}
-
-void foundRPeak(Peak peak){
-	int rr = peak.time - getHeadPeak(&rpeaks).time;
-
-	if (rr > RR_LOW && rr < RR_HIGH){
-		updateNewRPeak(peak);
-	} else {
-		if (rr > RR_MISS){
-			searchBack();
-		}
-	}
-}
-
-void updateNoRPeak(Peak peak){
-	NPKF = (peak.value)/8 + (7*NPKF/8);
-	updateThresholds();
-}
-
-void updateThresholds(){
-	THRESHOLD1 = NPKF + (SPKF - NPKF)/4;
-	THRESHOLD2 = THRESHOLD2/2;
-}
-
-void updateNewRPeak(Peak peak){
-	insertToBufferPeak(peak, &rpeaks);
-	insertToBufferPeak(peak, &rpeaks_ok);
-	SPKF = peak.value/8 + 7*SPKF/8;
-	RR_AVG1 = calculateRRAVG1();
-	RR_AVG2 = calculateRRAVG2();
-	updateLowHighMiss();
-	updateThresholds();
-}
-
-void updateLowHighMiss(){
-	RR_LOW = 92*RR_AVG2/100;
-	RR_HIGH = 116*RR_AVG2/100;
-	RR_MISS = 166*RR_AVG2/100;
-}
-
-int calculateRRAVG1(){
-	int count = 8;
-	int sum = 0;
-	int i;
-	for (i = 0; i < count; i++){
-		Peak peak1 = getPreviousPeak(i, &rpeaks);
-		int first = peak1.value;
-		int before = getPreviousPeak(i+1, &rpeaks).value;
-		sum += (first - before);
-	}
-
-	return sum/count;
-}
-
-int calculateRRAVG2(){
-	int count = 8;
-	int sum = 0;
-	int i;
-	for (i = 0; i < count; i++){
-		int first = getPreviousPeak(i, &rpeaks_ok).value;
-		int before = getPreviousPeak(i+1, &rpeaks_ok).value;
-		sum += (first - before);
-	}
-
-	return sum/count;
-}
-
-void searchBack(){
-	int value = findPeakSearchback();
-
-	if(value != 0){
-		SPKF = value/4 + 3*SPKF/4;
-	}
-	RR_AVG1 = calculateRRAVG1();
-	updateLowHighMiss();
-	updateThresholds();
-}
-
-int findPeakSearchback(){
-	int i;
-	for (i = 0; i < peaks.size; i++){
-		Peak peak = getPreviousPeak(i,&peaks);
-		if (peak.value > THRESHOLD2){
-			insertToBufferPeak(peak, &rpeaks);
-			return peak.value;
-		}
-	}
-	return 0;
-}
-
 
 
 
