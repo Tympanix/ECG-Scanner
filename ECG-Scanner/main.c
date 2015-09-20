@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
 	filterNextData();
 
 	int time;
-	for(time = 0; time < 2000; time++){
+	for(time = 0; time < 2500; time++){
 		filterNextData();
 
 		int current = getHeadBuffer(&mwiOut);
@@ -171,6 +171,7 @@ Peak findPeakSearchback(int * result) {
 		if (peak.value > THRESHOLD2) {
 			printf(" to time=%d", peak.time);
 			insertToBufferPeak(peak, &rpeaks);
+			insertToBufferPeak(peak, &rpeaks_ok); //Only experimental
 			*result = 1;
 			return peak;
 		}
@@ -201,19 +202,19 @@ void searchBack() {
 void foundRPeak(Peak peak) {
 	int rr = peak.time - getHeadPeak(&rpeaks).time;
 
+	printf(" (RR=%d, LOW=%d, HIGH=%d)\t", rr, RR_LOW, RR_HIGH);
+
 	if (rr > RR_LOW && rr < RR_HIGH) {
 		printf(" ***RPeak!");
 		updateNewRPeak(peak);
 	}
 	else {
-		printf(" - Outside RR (RR=%d, LOW=%d, HIGH=%d)\t", rr, RR_LOW, RR_HIGH);
 		if (rr > RR_MISS) {
 			printf(" ***Searchback");
 			searchBack();
 			return;
 		}
-		printf(" - Under R_MIIS, do nothing");
-		
+		printf(" - Under R_MIIS, do nothing");	
 	}
 }
 

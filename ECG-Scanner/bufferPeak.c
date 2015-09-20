@@ -47,14 +47,11 @@ int getAverageRRPeak(buffPeak * buffer, int goback) {
 	if (count == 0) return 0;
 	int i;
 	int sum = 0;
-	printf(" AVGSUM={");
 	for (i = 0; i < count; i++) {
 		Peak now = getPreviousPeak(i, buffer);
 		Peak before = getPreviousPeak(i + 1, buffer);
 		sum += (now.time - before.time);
-		printf("(%d-%d) ", now.time, before.time);
 	}
-	printf("}/%d", count);
 	return sum / count;
 }
 
