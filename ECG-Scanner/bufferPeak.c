@@ -4,13 +4,12 @@
 #include "bufferPeak.h"
 
 
-
-
 void initBufferPeak(int size, buffPeak * buffer)
 {
 	buffer->data = calloc(size,sizeof(*(buffer->data)));
 	buffer->head = size-1;
 	buffer->size = size;
+	buffer->inserts = 0;
 
 
 }
@@ -23,6 +22,7 @@ void cleanupBufferPeak(buffPeak * buffer)
 void insertToBufferPeak(Peak data, buffPeak * buffer){
 	movePointerBufferPeak(buffer);
 	buffer->data[buffer->head] = data;
+	buffer->inserts++;
 }
 
 void movePointerBufferPeak(buffPeak * buffer){
@@ -40,6 +40,22 @@ Peak getPreviousPeak(int previousN, buffPeak * buffer){
 
 Peak getHeadPeak(buffPeak * buffer){
 	return getPreviousPeak(0,buffer);
+}
+
+int getAverageRRPeak(buffPeak * buffer, int goback) {
+	int count = min((buffer->inserts)-1, goback);
+	if (count == 0) return 0;
+	int i;
+	int sum = 0;
+	printf(" AVGSUM={");
+	for (i = 0; i < count; i++) {
+		Peak now = getPreviousPeak(i, buffer);
+		Peak before = getPreviousPeak(i + 1, buffer);
+		sum += (now.time - before.time);
+		printf("(%d-%d) ", now.time, before.time);
+	}
+	printf("}/%d", count);
+	return sum / count;
 }
 
 

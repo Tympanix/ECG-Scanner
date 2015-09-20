@@ -1,10 +1,3 @@
-/*
- * bufferPeak.h
- *
- *  Created on: 16 Sep 2015
- *      Author: feynman
- */
-
 #ifndef BUFFERPEAK_H_
 #define BUFFERPEAK_H_
 #include "peak.h"
@@ -12,6 +5,7 @@
 typedef struct{
 	int head;
 	int size;
+	int inserts;
 	Peak * data;
 } buffPeak;
 
@@ -22,5 +16,6 @@ void movePointerBufferPeak(buffPeak * buffer);
 //Peak getPreviousByIntFromBufferPeak(int previousN, buffPeak * buffer);
 Peak getPreviousPeak(int previousN, buffPeak * buffer);
 Peak getHeadPeak(buffPeak * buffer);
+int getAverageRRPeak(buffPeak * buffer, int goback);
 
 #endif /* BUFFERPEAK_H_ */
