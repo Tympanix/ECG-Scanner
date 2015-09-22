@@ -42,18 +42,6 @@ Peak getHeadPeak(buffPeak * buffer){
 	return getPreviousPeak(0,buffer);
 }
 
-int getAverageRRPeak(buffPeak * buffer, int goback) {
-	int count = min((buffer->inserts)-1, goback);
-	if (count == 0) return 0;
-	int i;
-	int sum = 0;
-	for (i = 0; i < count; i++) {
-		Peak now = getPreviousPeak(i, buffer);
-		Peak before = getPreviousPeak(i + 1, buffer);
-		sum += (now.time - before.time);
-	}
-	return sum / count;
-}
 
 
 

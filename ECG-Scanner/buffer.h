@@ -9,8 +9,9 @@
 #define BUFFER_H_
 
 typedef struct{
-	int head;
-	int size;
+	unsigned int head;
+	unsigned int size;
+	unsigned long int inserts;
 	int * data;
 } buff;
 
@@ -20,5 +21,6 @@ void insertToBuffer(int data, buff * buffer);
 void movePointerBuffer(buff * buffer);
 int getPreviousBuffer(int previousN, buff * buffer);
 int getHeadBuffer(buff * buffer);
+int getAvgBuffer(buff * buffer);
 
 #endif /* BUFFER_H_ */

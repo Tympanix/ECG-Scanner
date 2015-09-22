@@ -9,8 +9,8 @@
 #define PEAK_H_
 
 typedef struct{
-	int value;
-	int time;
-}Peak;
+	unsigned int value;
+	unsigned int time;
+} Peak;
 
 #endif /* PEAK_H_ */

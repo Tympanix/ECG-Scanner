@@ -3,9 +3,9 @@
 #include "peak.h"
 
 typedef struct{
-	int head;
-	int size;
-	int inserts;
+	unsigned int head;
+	unsigned int size;
+	unsigned long int inserts;
 	Peak * data;
 } buffPeak;
 
