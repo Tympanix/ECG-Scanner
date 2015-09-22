@@ -9,3 +9,5 @@ Peak findPeakSearchback();
 void searchBack();
 void foundRPeak(Peak peak);
 void updateNoRPeak(Peak peak);
+void updateGUI(Peak peak);
+int calculatePulse();

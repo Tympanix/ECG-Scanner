@@ -21,6 +21,7 @@ int RR_MISS = -1;
 
 int SLOPEUP = 0;
 int RR;
+int NUM_MISS = 0;
 
 buff rawIn;
 buff lowPassOut;
@@ -61,36 +62,28 @@ int main(int argc, char *argv[]){
 	filterNextData();
 
 	unsigned long int time;
-	for(time = 0; time < 2500; time++){
+	for(time = 0; time < 50000; time++){
 		filterNextData();
 
 		int current = getHeadBuffer(&mwiOut);
 		int last = getPreviousBuffer(1, &mwiOut);
 
-		printf("%d\tValue: %d", time-1, last);
-
 		if (current < last && SLOPEUP){
 			// Maxima found
 			Peak peak = {last, time-1};
 			insertToBufferPeak(peak, &peaks);
-			//printf("New peak - value: %d\ttime: %d", peak.value, peak.time);
-			printf(" *** PEAK!");
 			if (peak.value > THRESHOLD1){
 				// R peak found!
-				printf(" - Possible RPeak");
 				foundRPeak(peak);
 			} else {
 				// No R Peak found!
 				updateNoRPeak(peak);
 			}
 
-			//printf("\n");
 			SLOPEUP = 0;
 		} else if (current > last) {
 			SLOPEUP = 1;
 		}
-
-		printf("\n");
 
 	}
 
@@ -156,6 +149,8 @@ void updateNewRPeak(Peak peak) {
 	RR_AVG2 = calculateRRAVG2();
 	updateLowHighMiss(RR_AVG2);
 	updateThresholds();
+
+	updateGUI(peak);
 }
 
 Peak findPeakSearchback(int * result) {
@@ -163,7 +158,6 @@ Peak findPeakSearchback(int * result) {
 	for (i = 1; i < peaks.size; i++) {
 		Peak peak = getPreviousPeak(i, &peaks);
 		if (peak.value > THRESHOLD2) {
-			printf(" to time=%d", peak.time);
 			RR = calculateRR(peak);
 			*result = 1;
 			return peak;
@@ -180,7 +174,6 @@ void searchBack() {
 	Peak peak = findPeakSearchback(&result);
 
 	if (!result) {
-		printf(" nothing found!");
 		return;
 	}
 
@@ -189,34 +182,30 @@ void searchBack() {
 	SPKF = peak.value/4 + 3*SPKF/4;
 	insertToBuffer(RR, &recentRR);
 	RR_AVG1 = calculateRRAVG1();
-	printf(" RR_AVG1=%d", RR_AVG1);
 	updateLowHighMiss(RR_AVG1);
 	updateThresholds();
+	updateGUI(peak);
 
 }
 
 int calculateRR(Peak peak) {
 	Peak last = getHeadPeak(&rpeaks);
 	if (last.time == 0) return 0;
-	RR = peak.time - last.time;
+	return peak.time - last.time;
 }
 
 void foundRPeak(Peak peak) {
 	RR = calculateRR(peak);
 
-	printf(" (RR=%d, LOW=%d, HIGH=%d)\t", RR, RR_LOW, RR_HIGH);
-
 	if (RR > RR_LOW && RR < RR_HIGH) {
-		printf(" ***RPeak!");
+		NUM_MISS = 0;
 		updateNewRPeak(peak);
-	}
-	else {
+	} else {
+		NUM_MISS++;
 		if (RR > RR_MISS) {
-			printf(" ***Searchback");
 			searchBack();
 			return;
-		}
-		printf(" - Under R_MISS, do nothing (RR=%d, MISS=%d)", RR, RR_MISS);	
+		}	
 	}
 }
 
@@ -224,6 +213,23 @@ void updateNoRPeak(Peak peak) {
 	NPKF = (peak.value/8) + (7*NPKF/8);
 	updateThresholds();
 }
+
+void updateGUI(Peak peak) {
+	printf("RPeak - time = %d, value = %d\n", peak.time, peak.value);
+	if (peak.value < 2000) {
+		printf("WARNING! RPeak value is too low\n");
+	}
+	if (NUM_MISS >= 5) {
+		printf("WARNING! Five or more RPeaks missed RR intervals\n");
+	}
+	printf("Pulse is now: %d\n", calculatePulse());
+}
+
+int calculatePulse() {
+	if (RR_AVG1 == 0) return 0;
+	return (250*60)/RR_AVG1;
+}
+
 
 
 
