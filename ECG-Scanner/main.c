@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 	filterNextData();
 
 	unsigned long int time;
-	for(time = 0; time < 7000; time++){
+	for(time = 0; time < 10000; time++){
 		filterNextData();
 
 		int current = getHeadBuffer(&mwiOut);
