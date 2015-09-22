@@ -31,3 +31,5 @@ ECG-Scanner/ECG Scanner.vcxproj
 ECG-Scanner/ECG Scanner.vcxproj.filters
 *.sln
 ECG-Scanner/ECG Scanner.opensdf
+*.vcxproj
+ECG-Scanner/ECGScanner.vcxproj.filters
