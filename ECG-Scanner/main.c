@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 	filterNextData();
 
 	unsigned long int time;
-	for(time = 0; time < 2500; time++){
+	for(time = 0; time < 7000; time++){
 		filterNextData();
 
 		int current = getHeadBuffer(&mwiOut);
@@ -183,7 +183,6 @@ void searchBack() {
 		printf(" nothing found!");
 		return;
 	}
-
 	
 	insertToBufferPeak(peak, &rpeaks);
 	SPKF = peak.value/4 + 3*SPKF/4;
@@ -223,6 +222,7 @@ void foundRPeak(Peak peak) {
 void updateNoRPeak(Peak peak) {
 	NPKF = (peak.value/8) + (7*NPKF/8);
 	updateThresholds();
+	printf(" - SPKF=%d, NPKF=%d, THR1=%d, THR2=%d", SPKF, NPKF, THRESHOLD1, THRESHOLD2);
 }
 
 
