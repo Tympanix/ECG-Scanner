@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "sensor.h"
 
-static const char filename[] = "ECG.txt";
+static const char filename[] = "ECG10800K.txt";
 static const FILE *file;
 
 int getNextData(){
@@ -17,4 +17,8 @@ void openFile(){
 
 void closeFile(){
 	fclose(file);
+}
+
+int endOfFile(){
+	return feof(file);
 }
