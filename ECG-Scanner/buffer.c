@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "buffer.h"
@@ -19,7 +18,6 @@ void cleanupBuffer(buff * buffer)
 }
 
 void insertToBuffer(int data, buff * buffer){
-	buffer->inserts++;
 	movePointerBuffer(buffer);
 	buffer->data[buffer->head] = data;
 }

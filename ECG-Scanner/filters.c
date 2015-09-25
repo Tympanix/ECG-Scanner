@@ -1,33 +1,38 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "filters.h"
 #include "buffer.h"
+#include "buffer64bit.h"
 
-void lowPassFilter(buff * input,buff * output){
-	int yn1	= getHeadBuffer(output);
-	int yn2 = getPreviousBuffer(1,output);
-	int xn = getHeadBuffer(input);
-	int xn6 = getPreviousBuffer(6,input);
-	int xn12 = getPreviousBuffer(12,input);
+const int OVERFLOW_HIGH_LIMIT = (INT_MAX/4)*3;
+const int OVERFLOW_LOW_LIMIT = (INT_MIN/4)*3;
 
-	int yn;
+void lowPassFilter(buff * input, buff * output){
+	long long int yn1	= getHeadBuffer64bit(output);
+	long long int yn2 = getPreviousBuffer64bit(1,output);
+	long long int xn = (long long) getHeadBuffer(input);
+	long long int xn6 = (long long) getPreviousBuffer(6, input);
+	long long int xn12 = (long long) getPreviousBuffer(12, input);
+
+	long long int yn;
 	yn = 2*yn1-yn2+(xn-(2*xn6)+xn12)/32;
 
-	insertToBuffer(yn,output);
+	insertToBuffer64bit(yn, output);
 }
 
-void highPassFilter(buff * input,buff * output){
-	int yn1 = getHeadBuffer(output);
-	int xn = getHeadBuffer(input);
-	int xn16 = getPreviousBuffer(16,input);
-	int xn17 = getPreviousBuffer(17,input);
-	int xn32 = getPreviousBuffer(32,input);
+void highPassFilter(buff64bit * input,buff * output){
+	long long int yn1 = (long long) getHeadBuffer(output);
+	long long int xn = getHeadBuffer64bit(input);
+	long long int xn16 = getPreviousBuffer64bit(16,input);
+	long long int xn17 = getPreviousBuffer64bit(17,input);
+	long long int xn32 = getPreviousBuffer64bit(32,input);
 
 	int yn;
-	yn = yn1-(xn/32)+xn16-xn17+(xn32/32);
+	yn = (int) (yn1-(xn/32)+xn16-xn17+(xn32/32));
 
-	insertToBuffer(yn,output);
+	insertToBuffer(yn, output);
 }
 
 void derivativeFilter(buff * input,buff * output){
@@ -59,5 +64,6 @@ void movingWindowFilter(buff * input,buff * output){
 	int yn = (sum/N);
 	insertToBuffer(yn,output);
 }
+
 
 
