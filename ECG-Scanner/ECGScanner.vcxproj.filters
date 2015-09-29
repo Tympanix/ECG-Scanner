@@ -36,9 +36,6 @@
     <ClCompile Include="sensor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="testData.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="buffer64bit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,9 +57,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sensor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="testData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">

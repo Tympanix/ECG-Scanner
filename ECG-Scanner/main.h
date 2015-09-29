@@ -1,3 +1,4 @@
+int main(int argc, char * argv[]);
 void checkHeartAttack();
 int ignorePeakSpike(Peak peak);
 void filterNextData();
@@ -9,6 +10,7 @@ void updateNewRPeak(Peak peak);
 Peak findPeakSearchback();
 void searchBack(Peak peak);
 void foundRPeak(Peak peak);
+void possibleRPeak(Peak peak);
 void checkMissedHeartbeat();
 void updateNoRPeak(Peak peak);
 void updateGUI(Peak peak);

@@ -4,3 +4,6 @@ ECG-Scanner/.vs/ECGScanner/v14/.suo
 ECG-Scanner/ECGScanner.opensdf
 ECG-Scanner/ECGScanner.vcxproj.filters
 *.filters
+ECG-Scanner/ECGScanner.vcxproj.user
+*.suo
+ECG-Scanner/ECGScanner.sdf

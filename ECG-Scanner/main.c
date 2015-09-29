@@ -3,7 +3,6 @@
 #include "buffer.h"
 #include "buffer64bit.h"
 #include "filters.h"
-#include "testData.h"
 #include "peak.h"
 #include "dynamicList.h"
 #include "bufferPeak.h"
@@ -35,6 +34,7 @@ int NUM_MISS = 0;
 int TIME_MISS_IGNORE = 0;
 int TIME_LAST_RPEAK = 0;
 int HEARTATTACK = 0;
+int TOTAL_RPEAKS = 0;
 const int INITIAL_RR_INTERVAL = 50;
 
 buff rawIn;
@@ -52,6 +52,18 @@ buff recentRR_OK;
 
 int main(int argc, char *argv[]){
 
+	if (argc < 2) {
+		printf("Please add path to datafile as command line argument\n");
+		getchar();
+		return 255;
+	}
+
+	if (!openFile(argv[1])) {
+		printf("File not found!\n");
+		getchar();
+		return 255;
+	}
+
 	// Initialise buffer sizes
 	initBuffer(13,&rawIn);
 	initBuffer64bit(33,&lowPassOut);
@@ -67,9 +79,6 @@ int main(int argc, char *argv[]){
 	// Initialise RR buffers
 	initBuffer(8, &recentRR);
 	initBuffer(8, &recentRR_OK);
-
-	openFile();
-	openTestFiles();
 
 	while(!endOfFile()){
 		filterNextData();
@@ -124,14 +133,14 @@ int main(int argc, char *argv[]){
 
 	}
 
+	printf("\nQRS algorith done! Total RPeaks found: %d", TOTAL_RPEAKS);
 
 	// Close files and cleanup!
 	closeFile();
-	closeTestFile();
 
 	cleanupBuffer(&rawIn);
-	cleanupBuffer(&lowPassOut);
-	cleanupBuffer64bit(&highPassOut);
+	cleanupBuffer64bit(&lowPassOut);
+	cleanupBuffer(&highPassOut);
 	cleanupBuffer(&derivateOut);
 	cleanupBuffer(&squaringOut);
 	cleanupBuffer(&mwiOut);
@@ -148,7 +157,7 @@ int main(int argc, char *argv[]){
 }
 
 void checkHeartAttack() {
-	if (time - TIME_LAST_RPEAK > RR_HIGH * 5 && !HEARTATTACK) {
+	if ((signed)(time - TIME_LAST_RPEAK) > RR_HIGH * 5 && !HEARTATTACK) {
 		HEARTATTACK = 1;
 		#ifdef RELEASE
 		printf("Warning! Heart stop\n");
@@ -157,7 +166,7 @@ void checkHeartAttack() {
 }
 
 int ignorePeakSpike(Peak peak) {
-	if (peak.value > SPKF * 10) {
+	if (peak.value > (unsigned)(SPKF * 10)) {
 		#ifdef DEBUG
 		if (debug()) printf(" - Peak too large SPKF=%d, NPKF=%d, THR1=%d, THR2=%d", SPKF, NPKF, THRESHOLD1, THRESHOLD2);
 		#endif
@@ -216,6 +225,11 @@ void updateNewRPeak(Peak peak) {
 	updateLowHighMiss(RR_AVG2);
 	updateThresholds();
 	
+	NUM_MISS = 0;
+	HEARTATTACK = 0;
+	TOTAL_RPEAKS++;
+	TIME_MISS_IGNORE = time;
+
 	#ifdef RELEASE
 	updateGUI(peak);
 	#endif
@@ -249,6 +263,12 @@ void searchBack(Peak peak) {
 		// Help algorith towards next RPeak!
 		RR_MISS = INITIAL_RR_INTERVAL;
 		insertToBufferPeak(peak, &rpeaks);
+		TOTAL_RPEAKS++;
+
+		#ifdef RELEASE
+		updateGUI(peak);
+		#endif
+
 		return;
 	}
 
@@ -270,6 +290,7 @@ void searchBack(Peak peak) {
 	#endif
 
 	HEARTATTACK = 0;
+	TOTAL_RPEAKS++;
 }
 
 int calculateRR(Peak peak) {
@@ -292,9 +313,6 @@ void possibleRPeak(Peak peak) {
 		if (debug()) printf(" ***RPeak!");
 		#endif
 		updateNewRPeak(peak);
-		NUM_MISS = 0;
-		HEARTATTACK = 0;
-		TIME_MISS_IGNORE = time;
 	} else {
 		checkMissedHeartbeat();
 		if (RR > RR_MISS) {

@@ -11,8 +11,12 @@ int getNextData(){
 	return value;
 }
 
-void openFile(){
+int openFile(char filename[]){
 		file = fopen(filename,"r");
+		if (file == NULL) {
+			return 0;
+		}
+		return 1;
 }
 
 void closeFile(){
