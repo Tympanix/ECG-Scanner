@@ -21,9 +21,6 @@
     <ClCompile Include="bufferPeak.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dynamicList.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="filters.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,9 +42,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bufferPeak.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dynamicList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="filters.h">

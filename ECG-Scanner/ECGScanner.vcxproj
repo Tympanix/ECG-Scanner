@@ -100,7 +100,6 @@
     <ClCompile Include="buffer.c" />
     <ClCompile Include="buffer64bit.c" />
     <ClCompile Include="bufferPeak.c" />
-    <ClCompile Include="dynamicList.c" />
     <ClCompile Include="filters.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="peak.c" />
@@ -110,7 +109,6 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="buffer64bit.h" />
     <ClInclude Include="bufferPeak.h" />
-    <ClInclude Include="dynamicList.h" />
     <ClInclude Include="filters.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="peak.h" />

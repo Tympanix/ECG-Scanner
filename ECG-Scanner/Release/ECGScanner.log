@@ -1,15 +1,14 @@
-﻿Build started 29-09-2015 22:26:48.
+﻿Build started 29-09-2015 22:38:24.
      1>Project "C:\Users\Mathias\Documents\Programmering\ECGScanner\ECG-Scanner\ECG-Scanner\ECGScanner.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _CONSOLE /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TC /analyze- /errorReport:prompt main.c
          main.c
+     1>main.c(181): warning C4133: 'function': incompatible types - from 'buff64bit *' to 'buff *'
      1>main.c(182): warning C4133: 'function': incompatible types - from 'buff64bit *' to 'buff *'
-     1>main.c(183): warning C4133: 'function': incompatible types - from 'buff64bit *' to 'buff *'
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Mathias\Documents\Programmering\ECGScanner\ECG-Scanner\ECG-Scanner\Release\ECGScanner.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Mathias\Documents\Programmering\ECGScanner\ECG-Scanner\ECG-Scanner\Release\ECGScanner.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Mathias\Documents\Programmering\ECGScanner\ECG-Scanner\ECG-Scanner\Release\ECGScanner.lib" /MACHINE:X86 /SAFESEH Release\buffer.obj
          Release\buffer64bit.obj
          Release\bufferPeak.obj
-         Release\dynamicList.obj
          Release\filters.obj
          Release\main.obj
          Release\peak.obj
@@ -20,4 +19,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.39
+Time Elapsed 00:00:00.74

@@ -4,7 +4,6 @@
 #include "buffer64bit.h"
 #include "filters.h"
 #include "peak.h"
-#include "dynamicList.h"
 #include "bufferPeak.h"
 #include "main.h"
 
